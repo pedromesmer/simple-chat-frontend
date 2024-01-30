@@ -10,6 +10,15 @@ interface IMessage {
 }
 
 const App: React.FC = () => {
+  const [name, setName] = useState(() => {
+    const caracters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let genName = '';
+    for (let i = 0; i < 5; i += 1) {
+      genName += caracters[Math.floor(Math.random() * caracters.length)];
+    }
+
+    return genName;
+  });
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([] as IMessage[]);
   const [socket, setSocket] =
@@ -18,9 +27,10 @@ const App: React.FC = () => {
   useEffect(() => {
     if (!socket) {
       setSocket(
-        io('http://localhost:3333', {
+        io('http://192.168.1.139:3333', {
           query: {
             room: 'sala',
+            name,
           },
         }),
       );
@@ -56,7 +66,7 @@ const App: React.FC = () => {
 
   return (
     <>
-      <h1>{socket && socket.id}</h1>
+      <h1>{name}</h1>
       <br />
       <input
         type="text"
@@ -67,13 +77,14 @@ const App: React.FC = () => {
         onSubmit={handleSendMessage}
         onKeyDown={onKeyDown}
         value={message}
+        autoComplete="off"
       />{' '}
       <button onClick={handleSendMessage}>Enviar</button>
       <br />
       <div style={{ margin: 10 }}>
         {messages.map((m, i) => (
           <div key={i.valueOf()} style={{ display: 'block' }}>
-            <p style={{ display: 'inline' }}>{m.user}: </p>
+            <p style={{ display: 'inline', fontWeight: 'bold' }}>{m.user}: </p>
             <p style={{ display: 'inline' }}>{m.message}</p>
           </div>
         ))}
